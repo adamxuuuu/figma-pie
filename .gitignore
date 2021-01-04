@@ -141,4 +141,4 @@ cython_debug/
 
 # project specific
 /local
-
+/.idea
