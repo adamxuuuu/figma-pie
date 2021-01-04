@@ -140,5 +140,5 @@ dmypy.json
 cython_debug/
 
 # project specific
-/local
+*/local/
 /.idea
