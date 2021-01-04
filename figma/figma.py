@@ -29,7 +29,7 @@ class Figma:
 
         # Save header and file id to a json file if write success
         info = {"FIGMA-HEADER": self._headers, "FIGMA-FILE-ID": self._file_id}
-        with open("credential.json", 'w') as of:
+        with open("../local/credential.json", 'w') as of:
             json.dump(info, of)
 
     def _get_file(self, params):
@@ -75,7 +75,7 @@ class Figma:
         if not os.path.isfile(self._cache):
             return
         if self._headers == "" or self._file_id == "":
-            with open("credential.json", 'r') as json_file:
+            with open("../local/credential.json", 'r') as json_file:
                 info = json.load(json_file)
             if self._headers == "":
                 self._headers = info["FIGMA-HEADER"]
