@@ -142,3 +142,5 @@ cython_debug/
 # project specific
 /local/
 /.idea
+attr.txt
+content.json
