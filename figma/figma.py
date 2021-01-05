@@ -3,19 +3,22 @@ import json
 import sys
 import os
 
+ids = {"ids": "1220%3A5791,1220%3A6129,1220%3A6404,1220%3A6687,1220%3A6939"}
+cred_path = "local/credential.json"
+
 
 class Figma:
 
     def __init__(self, headers, file_id, cache):
-        self._headers = headers  # "149259-0051397d-9b72-4aed-9dc8-3d7638d4a7e8"
-        self._file_id = file_id  # "S9BUNLMoVHrEQnu0xy85NV/"
+        self._headers = headers
+        self._file_id = file_id
         self._cache = cache
 
         # Try find info in file
         self._load_info()
 
     def get_file(self):
-        resp = self._get_file({"ids": "1220%3A5791"})
+        resp = self._get_file(ids)
         try:
             content = resp.json()
             print("Writing results to cache")
@@ -29,7 +32,7 @@ class Figma:
 
         # Save header and file id to a json file if write success
         info = {"FIGMA-HEADER": self._headers, "FIGMA-FILE-ID": self._file_id}
-        with open("../local/credential.json", 'w') as of:
+        with open(cred_path, 'w') as of:
             json.dump(info, of)
 
     def _get_file(self, params):
@@ -75,7 +78,7 @@ class Figma:
         if not os.path.isfile(self._cache):
             return
         if self._headers == "" or self._file_id == "":
-            with open("../local/credential.json", 'r') as json_file:
+            with open("local/credential.json", 'r') as json_file:
                 info = json.load(json_file)
             if self._headers == "":
                 self._headers = info["FIGMA-HEADER"]

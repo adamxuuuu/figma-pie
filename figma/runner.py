@@ -1,8 +1,8 @@
 from figma import Figma
-from attr_extractor import Extractor
+from extractor import Extractor
 import sys
 
-cache = "content.json"
+cache = "local/content.json"
 headers = ""
 fileId = ""
 
