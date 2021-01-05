@@ -2,7 +2,7 @@ from figma import Figma
 from extractor import Extractor
 import sys
 
-cache = "local/content.json"
+cache = "content.json"
 headers = ""
 fileId = ""
 

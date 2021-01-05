@@ -4,7 +4,7 @@ from progress.bar import Bar
 
 from ordered_set import OrderedSet
 
-out_path = "local/attr.txt"
+out_path = "attr.txt"
 
 
 class Extractor:
@@ -25,11 +25,12 @@ class Extractor:
             self._data = json.load(json_file)
 
     def _find_attr(self, d):
-        # attr_id = [v for k, v in d.items() if k == 'id']
         for k, v in d.items():
             try:
                 if k == "name" and re.match("CN_*", v):
-                    self._res.add(v)
+                    # _id = [v for k, v in d.items() if k == 'id']
+                    _type = [v for k, v in d.items() if k == 'type']
+                    self._res.add((v, _type[0]))
                 if isinstance(v, list):
                     for item in v:
                         self._find_attr(item)
@@ -39,10 +40,11 @@ class Extractor:
     def write_attr(self):
         self._get_data()
         self._find_attr(self._data)
+        print(self._res)
         with open(out_path, 'w') as of:
             bar = Bar('Processing', max=len(self._res))
-            for _name in self._res:
-                s = "%s\n" % _name
+            for _tup in self._res:
+                s = "{},{}\n".format(_tup[0], _tup[1])
                 of.write(s)
                 bar.next()
             bar.finish()
