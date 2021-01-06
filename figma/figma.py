@@ -13,11 +13,9 @@ class Figma:
 
     def __init__(self, token, cache):
         self._api_uri = 'https://api.figma.com/v1/'
-        self._token_path = "../token.json"
+        self._token_path = '../token.json'
         self._api_token = token
         self._cache = cache
-
-        self._load_info()
 
     def _api_request(self, endpoint, method='get', payload=None):
         method = method.lower()
@@ -25,6 +23,7 @@ class Figma:
         if payload is None:
             payload = ''
 
+        self._load_info()
         header = {'X-Figma-Token': '{0}'.format(self._api_token), 'Content-Type': 'application/json'}
 
         try:
@@ -82,19 +81,22 @@ class Figma:
             for k, v in params.items():
                 optional_param += k + '=' + v + '&'
 
-        data = self._api_request('files/{0}{1}'.format(file_key, optional_param), method='get')
+        endpoint = 'files/{0}{1}'.format(file_key, optional_param)
+        print('-> Connecting to figma api endpoint {}'.format(self._api_uri + endpoint))
+        data = self._api_request(endpoint, method='get')
 
         if use_cache:
             self._to_cache(data)
         return data
 
-    def _to_cache(self, data):
+    def _to_cache(self, data, key='document'):
+        _d = data[key]
         try:
-            print("Writing content to cache...")
+            print('-> Writing content to cache')
             with open(self._cache, 'w') as of:
-                json.dump(data["document"], of)
+                json.dump(_d, of)
         except OSError or json.decoder.JSONDecodeError as e:
-            print("Error when writing to file {}, {}".format(self._cache, e))
+            print('Error when writing to file {}, {}'.format(self._cache, e))
         finally:
             of.close()
 
@@ -105,7 +107,7 @@ class Figma:
             try:
                 with open(self._token_path, 'r') as json_file:
                     info = json.load(json_file)
-                    self._api_token = info["FIGMA-TOKEN"]
+                    self._api_token = info['FIGMA-TOKEN']
             except FileNotFoundError:
                 print('local token file not found, please run with argument --token')
                 print('System exiting...')

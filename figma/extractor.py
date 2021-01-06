@@ -48,3 +48,5 @@ class Extractor:
             print(e)
         finally:
             of.close()
+
+        return self._res

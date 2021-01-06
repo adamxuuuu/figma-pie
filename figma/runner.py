@@ -12,7 +12,9 @@ cache_path = '../content.json'
 headers = ''
 fileId = ''
 
+
 if __name__ == '__main__':
+    # Parse CLI argument
     for arg in sys.argv[1:]:
         if arg == "--help":
             print(
@@ -35,4 +37,7 @@ OPTIONS:
         figma.get_file(fileId, ids)
 
     ext = Extractor(cache_path)
-    ext.extract()
+    res = ext.extract()
+
+    print('-> finished extracting {} attributes'.format(len(res)))
+
