@@ -144,4 +144,4 @@ cython_debug/
 /.idea
 attr.txt
 content.json
-credential.json
+token.json

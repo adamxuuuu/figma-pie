@@ -1,10 +1,16 @@
+# !/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Time      :2021/1/6 3:21 PM
+# @Author    :AdamXu
 from figma import Figma
 from extractor import Extractor
 import sys
 
-cache = "content.json"
-headers = ""
-fileId = ""
+
+ids = {"ids": "1220%3A5791,1220%3A6129,1220%3A6404,1220%3A6687,1220%3A6939"}
+cache_path = '../content.json'
+headers = ''
+fileId = ''
 
 if __name__ == '__main__':
     for arg in sys.argv[1:]:
@@ -19,15 +25,14 @@ OPTIONS:
                 """)
             sys.exit()
         elif "--token" in arg:
-            headers = {"X-Figma-Token": arg.split('=')[1]}
+            headers = arg.split('=')[1]
         elif "--file" in arg:
             fileId = arg.split('=')[1]
 
     if len(sys.argv) > 1:
-        print("Reload file using arg...")
         # Reload data from figma source if needed
-        figma = Figma(headers, fileId, cache)
-        figma.get_file()
+        figma = Figma(headers, cache_path)
+        figma.get_file(fileId, ids)
 
-    ext = Extractor(cache)
-    ext.write_attr()
+    ext = Extractor(cache_path)
+    ext.extract()
