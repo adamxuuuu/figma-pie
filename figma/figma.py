@@ -4,7 +4,7 @@ import sys
 import os
 
 ids = {"ids": "1220%3A5791,1220%3A6129,1220%3A6404,1220%3A6687,1220%3A6939"}
-cred_path = "local/credential.json"
+cred_path = "credential.json"
 
 
 class Figma:
@@ -78,7 +78,7 @@ class Figma:
         if not os.path.isfile(self._cache):
             return
         if self._headers == "" or self._file_id == "":
-            with open("local/credential.json", 'r') as json_file:
+            with open(cred_path, 'r') as json_file:
                 info = json.load(json_file)
             if self._headers == "":
                 self._headers = info["FIGMA-HEADER"]
