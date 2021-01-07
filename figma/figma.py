@@ -13,7 +13,7 @@ class Figma:
 
     def __init__(self, token, cache):
         self._api_uri = 'https://api.figma.com/v1/'
-        self._token_path = '../token.json'
+        self._token_path = './token.json'
         self._api_token = token
         self._cache = cache
 

@@ -12,7 +12,7 @@ from ordered_set import OrderedSet
 class Extractor:
 
     def __init__(self, data_path):
-        self._out_path = '../attr.txt'
+        self._out_path = './attr.txt'
         self._res = OrderedSet()
 
         try:

@@ -7,8 +7,8 @@ from extractor import Extractor
 import sys
 
 
-ids = {"ids": "1220%3A5791,1220%3A6129,1220%3A6404,1220%3A6687,1220%3A6939"}
-cache_path = '../content.json'
+ids = {'ids': '1283%3A4922,1220%3A6129,1220%3A6404,1220%3A6687,1220%3A6939'}
+cache_path = './content.json'
 headers = ''
 fileId = ''
 
