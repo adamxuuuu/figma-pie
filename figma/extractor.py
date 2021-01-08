@@ -12,8 +12,8 @@ from ordered_set import OrderedSet
 class Extractor:
 
     def __init__(self, data_path):
-        self._out_path = './attr.txt'
-        self._res = OrderedSet()
+        self._out_path = './attributes.txt'
+        self._res = dict()
 
         try:
             with open(data_path, 'r') as json_file:
@@ -27,9 +27,10 @@ class Extractor:
         for k, v in d.items():
             try:
                 if k == "name" and re.match("CN_*", v):
-                    # _id = [v for k, v in d.items() if k == 'id']
-                    _type = [v for k, v in d.items() if k == 'type']
-                    self._res.add((v, _type[0]))
+                    _id = [v for k, v in d.items() if k == 'id']
+                    # _type = [v for k, v in d.items() if k == 'type']
+                    attr = v.split('|')
+                    self._res[attr[0]] = attr[1] if len(attr) > 1 else ''
                 if isinstance(v, list):
                     for item in v:
                         self._extract(item)
@@ -41,8 +42,8 @@ class Extractor:
         self._extract(self._data)
         try:
             with open(self._out_path, 'w') as of:
-                for _tup in self._res:
-                    s = "{},{}\n".format(_tup[0], _tup[1])
+                for k, v in self._res.items():
+                    s = "{},{}\n".format(k, v)
                     of.write(s)
         except OSError as e:
             print(e)

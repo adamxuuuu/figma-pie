@@ -6,7 +6,8 @@ from figma import Figma
 from extractor import Extractor
 import sys
 
-ids = {'ids': '1283%3A4922,1220%3A6129,1220%3A6404,1220%3A6687,1220%3A6939'}
+# 1220%3A5791,1304%3A5141,1304%3A5475,1304%3A5751,1304%3A5997
+ids = {'ids': '1220%3A5791,1304%3A5141,1304%3A5475,1304%3A5751,1304%3A5997'}
 cache_path = './content.json'
 headers = ''
 fileId = ''
