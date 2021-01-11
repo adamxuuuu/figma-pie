@@ -273,9 +273,10 @@ class RegularPolygon:
 
 class Rectangle:
     # A rectangle [Shares properties of Vector plus corner_radius]
-    def __init__(self, corner_radius, blend_mode, constraints, abs_bounding_box, size, relative_transform, fill_geometry,
-                 stroke_weight, stroke_geometry, stroke_align, export_settings=None, preserve_ratio=False,
-                 transition_node_id=None, opacity=1, effects=None, is_mask=False, fills=None, strokes=None):
+    def __init__(self, corner_radius, blend_mode, constraints, abs_bounding_box, size, relative_transform,
+                 fill_geometry, stroke_weight, stroke_geometry, stroke_align, export_settings=None,
+                 preserve_ratio=False, transition_node_id=None, opacity=1, effects=None, is_mask=False, fills=None,
+                 strokes=None):
         self.corner_radius = corner_radius  # Radius of each corner of the rectangle
         self.export_settings = export_settings  # An array of export settings representing images to export from node
         self.blend_mode = blend_mode  # How this node blends with nodes behind it in the scene
@@ -417,7 +418,7 @@ class Rect:
 
 
 class BlendMode(Enum):
-    # Enum describing how layer blens with layers below
+    # Enum describing how layer blends with layers below
     # This type is a string enum with the following possible values:
 
     # Normal Blends
@@ -457,7 +458,7 @@ class LayoutConstraint:
 class LayoutGrid:
     # Guides to align and place objects within a frame
     def __init__(self, pattern, section_size, visible, color, alignment, gutter_size, offset, count):
-        self.pattern = pattern  # Orientatoin of the grid as a string enum
+        self.pattern = pattern  # Orientation of the grid as a string enum
         self.section_size = section_size  # Width of column grid or height of row grid or square grid spacing
         self.visible = visible  # Is the grid currently visible?
         self.color = color  # Color of the grid
