@@ -6,7 +6,9 @@ import json
 import re
 import sys
 
-from ordered_set import OrderedSet
+
+def prRed(skk): print("\033[91m {}\033[00m".format(skk))
+def prGreen(skk): print("\033[92m {}\033[00m".format(skk))
 
 
 class Extractor:
@@ -38,8 +40,30 @@ class Extractor:
                 # print('{},{}'.format(k, v))
                 pass
 
+    def _cache_to_dict(self):
+        d = {}
+        try:
+            with open(self._out_path, 'r') as cache:
+                for line in cache:
+                    (k, v) = line.split(',')
+                    d[k] = v
+        except FileNotFoundError:
+            pass
+        return d
+
+    def _show_diff(self):
+        removed = set(self._cache_to_dict()) - set(self._res)
+        added = set(self._res) - set(self._cache_to_dict())
+        for rem in removed:
+            prRed('- ' + rem)
+        for ad in added:
+            prGreen('+ ' + ad)
+
     def extract(self):
         self._extract(self._data)
+        # show changes
+        self._show_diff()
+
         try:
             with open(self._out_path, 'w') as of:
                 for k, v in self._res.items():
