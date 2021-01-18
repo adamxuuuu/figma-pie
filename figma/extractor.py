@@ -40,7 +40,7 @@ class Extractor:
                 # print('{},{}'.format(k, v))
                 pass
 
-    def _cache_to_dict(self):
+    def _load_cache(self):
         d = {}
         try:
             with open(self._out_path, 'r') as cache:
@@ -52,8 +52,8 @@ class Extractor:
         return d
 
     def _show_diff(self):
-        removed = set(self._cache_to_dict()) - set(self._res)
-        added = set(self._res) - set(self._cache_to_dict())
+        removed = set(self._load_cache()) - set(self._res)
+        added = set(self._res) - set(self._load_cache())
         for rem in removed:
             prRed('- ' + rem)
         for ad in added:

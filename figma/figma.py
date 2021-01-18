@@ -8,6 +8,8 @@ import requests
 import json
 import os
 
+from components import *
+
 
 class Figma:
 
@@ -85,9 +87,15 @@ class Figma:
         print('-> Connecting to figma api endpoint {}'.format(self._api_uri + endpoint))
         data = self._api_request(endpoint, method='get')
 
+        if data is None:
+            print('-> Connection failed, abort...')
+            sys.exit()
+
         if use_cache:
             self._to_cache(data)
-        return data
+
+        return File(data['name'], data['document'], data['components'], data['lastModified'], data['thumbnailUrl'],
+                    data['schemaVersion'], data['styles'])
 
     def _to_cache(self, data, key='document'):
         _d = data[key]

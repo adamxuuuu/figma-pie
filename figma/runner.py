@@ -6,8 +6,8 @@ from figma import Figma
 from extractor import Extractor
 import sys
 
-# 1220%3A5791,1304%3A5141,1304%3A5475,1304%3A5751,1304%3A5997
-ids = {'ids': '1220%3A5791,1304%3A5141,1304%3A5475,1304%3A5751,1304%3A5997'}
+# 1220%3A5791,1304%3A5141,1304%3A5475,1304%3A5751,1304%3A5997,1309%3A3
+ids = {'ids': '1220%3A5791,1304%3A5141,1304%3A5475,1304%3A5751,1304%3A5997,1309%3A3'}
 cache_path = './content.json'
 headers = ''
 fileId = ''
@@ -30,10 +30,10 @@ OPTIONS:
         elif "--file" in arg:
             fileId = arg.split('=')[1]
 
-    if len(sys.argv) > 1:
-        # Reload data from figma source if needed
-        figma = Figma(headers, cache_path)
-        figma.get_file(fileId, ids)
+    if fileId:
+        # Reload data from figma source if header and fileId are provided
+        api = Figma(headers, cache_path)
+        file = api.get_file(fileId, ids)
 
     ext = Extractor(cache_path)
     res = ext.extract()
