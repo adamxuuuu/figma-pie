@@ -8,6 +8,8 @@ import sys
 
 
 def prRed(skk): print("\033[91m {}\033[00m".format(skk))
+
+
 def prGreen(skk): print("\033[92m {}\033[00m".format(skk))
 
 
@@ -28,11 +30,13 @@ class Extractor:
     def _extract(self, d):
         for k, v in d.items():
             try:
-                if k == "name" and re.match("CN_*", v):
+                if k == "name" and re.match('[A-Z]+_[A-Z]+_*', v):
                     _id = [v for k, v in d.items() if k == 'id']
-                    # _type = [v for k, v in d.items() if k == 'type']
+                    _content = [v for k, v in d.items() if k == 'characters']
                     attr = v.split('|')
-                    self._res[attr[0]] = attr[1] if len(attr) > 1 else ''
+                    self._res[attr[0]] = attr[1] + '|' + " ".join(_content) \
+                        + '|' + " ".join(_id)\
+                        if len(attr) > 1 else ''
                 if isinstance(v, list):
                     for item in v:
                         self._extract(item)
@@ -45,9 +49,9 @@ class Extractor:
         try:
             with open(self._out_path, 'r') as cache:
                 for line in cache:
-                    (k, v) = line.split(',')
+                    (k, v) = line.split('|', 1)
                     d[k] = v
-        except FileNotFoundError:
+        except FileNotFoundError or ValueError:
             pass
         return d
 
@@ -67,7 +71,7 @@ class Extractor:
         try:
             with open(self._out_path, 'w') as of:
                 for k, v in self._res.items():
-                    s = "{},{}\n".format(k, v)
+                    s = "{}|{}\n".format(k, v)
                     of.write(s)
         except OSError as e:
             print(e)
