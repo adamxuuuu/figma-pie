@@ -5,6 +5,9 @@
 import json
 import re
 import sys
+from pathlib import Path
+
+HOME = Path(__file__).parents[1]
 
 
 def prRed(skk): print("\033[91m {}\033[00m".format(skk))
@@ -15,16 +18,15 @@ def prGreen(skk): print("\033[92m {}\033[00m".format(skk))
 
 class Extractor:
 
-    def __init__(self, data_path):
-        self._out_path = './attributes.txt'
+    def __init__(self, cache_path):
+        self._out_path = HOME / 'attributes.txt'
         self._res = dict()
+        self._data_path = HOME / cache_path
 
-        try:
-            with open(data_path, 'r') as json_file:
-                self._data = json.load(json_file)
-        except FileNotFoundError:
-            print('Local cache not found, please run script with argument --file')
-            print('System exiting...')
+        if self._data_path.exists():
+            self._data = json.loads(self._data_path.read_text())
+        else:
+            print('-> Local cache not found, please run script with argument --file')
             sys.exit()
 
     def _extract(self, d):
@@ -35,7 +37,7 @@ class Extractor:
                     _content = [v for k, v in d.items() if k == 'characters']
                     attr = v.split('|')
                     self._res[attr[0]] = attr[1] + '|' + " ".join(_content) \
-                        + '|' + " ".join(_id)\
+                                         + '|' + " ".join(_id) \
                         if len(attr) > 1 else ''
                 if isinstance(v, list):
                     for item in v:

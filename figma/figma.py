@@ -3,19 +3,19 @@
 # @Time      :2021/1/6 3:21 PM
 # @Author    :AdamXu
 import sys
+from pathlib import Path
 
 import requests
 import json
-import os
 
-from components import *
+HOME = Path(__file__).parents[1]
 
 
 class Figma:
 
     def __init__(self, token, cache):
         self._api_uri = 'https://api.figma.com/v1/'
-        self._token_path = './token.json'
+        self._token_path = HOME / 'secret/token.json'
         self._api_token = token
         self._cache = cache
 
@@ -25,8 +25,7 @@ class Figma:
         if payload is None:
             payload = ''
 
-        self._load_info()
-        header = {'X-Figma-Token': '{0}'.format(self._api_token), 'Content-Type': 'application/json'}
+        header = self._header()
 
         try:
             url = '{0}{1}'.format(self._api_uri, endpoint)
@@ -47,9 +46,7 @@ class Figma:
             if response.status_code == 200:
                 # Save header and file id to a json file if write success
                 info = {"FIGMA-TOKEN": self._api_token}
-                with open(self._token_path, 'w') as of:
-                    json.dump(info, of)
-                of.close()
+                self._token_path.write_text(json.dumps(info))
                 return json.loads(response.text)
             else:
                 return None
@@ -92,31 +89,27 @@ class Figma:
             sys.exit()
 
         if use_cache:
-            self._to_cache(data)
+            self._toCache(data)
 
-        return File(data['name'], data['document'], data['components'], data['lastModified'], data['thumbnailUrl'],
-                    data['schemaVersion'], data['styles'])
+        return data
 
-    def _to_cache(self, data, key='document'):
+    def _toCache(self, data, key='document'):
         _d = data[key]
         try:
             print('-> Writing content to cache')
-            with open(self._cache, 'w') as of:
-                json.dump(_d, of)
+            (HOME / self._cache).write_text(json.dumps(_d))
         except OSError or json.decoder.JSONDecodeError as e:
             print('Error when writing to file {}, {}'.format(self._cache, e))
-        finally:
-            of.close()
 
-    def _load_info(self):
-        if not os.path.isfile(self._cache):
+    def _header(self):
+        if not self._token_path.exists():
             return
         if self._api_token == '':
             try:
-                with open(self._token_path, 'r') as json_file:
-                    info = json.load(json_file)
-                    self._api_token = info['FIGMA-TOKEN']
+                data = self._token_path.read_text()
+                info = json.loads(data)
+                self._api_token = info['FIGMA-TOKEN']
             except FileNotFoundError:
                 print('local token file not found, please run with argument --token')
-                print('System exiting...')
                 sys.exit()
+        return {'X-Figma-Token': '{0}'.format(self._api_token), 'Content-Type': 'application/json'}

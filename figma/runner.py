@@ -9,7 +9,7 @@ import sys
 # 1220%3A5791,1304%3A5141,1304%3A5475,1304%3A5751,1304%3A5997,1309%3A3
 # ids = {'ids': '1220%3A5478'}
 ids = {'ids': '1220%3A5791,1304%3A5141,1304%3A5475,1304%3A5751,1304%3A5997'}
-cache_path = './content.json'
+cache_path = 'content.json'
 
 
 def main():
@@ -33,9 +33,9 @@ OPTIONS:
             file_id = arg.split('=')[1]
 
     if file_id:
-        # Reload data from figma source if header and file_id are provided
+        # Reload data from figma source if file_id are provided
         api = Figma(headers, cache_path)
-        file = api.get_file(file_id, ids)
+        api.get_file(file_id, ids)
 
     ext = Extractor(cache_path)
     res = ext.extract()
