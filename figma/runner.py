@@ -4,17 +4,19 @@
 # @Author    :AdamXu
 from figma import Figma
 from extractor import Extractor
+from drive import updateSheet
 import sys
 
-# 1220%3A5791,1304%3A5141,1304%3A5475,1304%3A5751,1304%3A5997,1309%3A3
-# ids = {'ids': '1220%3A5478'}
-ids = {'ids': '1220%3A5791,1304%3A5141,1304%3A5475,1304%3A5751,1304%3A5997'}
-cache_path = 'content.json'
+# 1220%3A5791,1304%3A5141,1304%3A5475,1304%3A5751,1304%3A5997,1309%3A3,1607%3A8781,1608%3A11,1583%3A44,1598%3A8650
+NODE_IDS = {'ids': '1220%3A5791,1304%3A5141,1304%3A5475,1304%3A5751,1304%3A5997,1309%3A3,1607%3A8781,1608%3A11,'
+                   '1583%3A44,1598%3A8650'}
+CACHE = 'content.json'
 
 
 def main():
     headers = ''
     file_id = ''
+    update = False
     # Parse CLI argument
     for arg in sys.argv[1:]:
         if arg == "--help":
@@ -31,16 +33,22 @@ OPTIONS:
             headers = arg.split('=')[1]
         elif "--file" in arg:
             file_id = arg.split('=')[1]
+        elif "--update" in arg:
+            update = True
 
     if file_id:
         # Reload data from figma source if file_id are provided
-        api = Figma(headers, cache_path)
-        api.get_file(file_id, ids)
+        api = Figma(headers, CACHE)
 
-    ext = Extractor(cache_path)
-    res = ext.extract()
+        # Get the files and store to cache if specified
+        api.get_file(file_id, NODE_IDS)
+
+    res = Extractor(CACHE).extract()
 
     print('-> finished extracting {} attributes'.format(len(res)))
+
+    if update:
+        updateSheet()
 
 
 if __name__ == '__main__':

@@ -36,9 +36,9 @@ class Extractor:
                     _id = [v for k, v in d.items() if k == 'id']
                     _content = [v for k, v in d.items() if k == 'characters']
                     attr = v.split('|')
-                    self._res[attr[0]] = attr[1] + '|' + " ".join(_content) \
-                                         + '|' + " ".join(_id) \
+                    self._res[attr[0]] = attr[1] + '|' + " ".join(_content) + '|' + " ".join(_id) \
                         if len(attr) > 1 else ''
+                # Recursion
                 if isinstance(v, list):
                     for item in v:
                         self._extract(item)

@@ -4,7 +4,6 @@
 # @Author    :AdamXu
 import sys
 from pathlib import Path
-
 import requests
 import json
 
@@ -25,40 +24,26 @@ class Figma:
         if payload is None:
             payload = ''
 
-        header = self._header()
+        header = self._getHeader()
 
         try:
-            url = '{0}{1}'.format(self._api_uri, endpoint)
-            if method == 'head':
-                response = requests.head(url, headers=header)
-            elif method == 'delete':
-                response = requests.delete(url, headers=header)
-            elif method == 'get':
-                response = requests.get(url, headers=header, data=payload)
-            elif method == 'options':
-                response = requests.options(url, headers=header)
-            elif method == 'post':
-                response = requests.post(url, headers=header, data=payload)
-            elif method == 'put':
-                response = requests.put(url, headers=header, data=payload)
+            resp = self._getResponse(header, endpoint, method, payload)
+            # Check response status
+            code = resp.status_code
+            if code == 200:
+                # Save token to a json file if connection is OK
+                self._token_path.write_text(json.dumps({"FIGMA-TOKEN": self._api_token}))
+                return json.loads(resp.text), code
             else:
-                response = None
-            if response.status_code == 200:
-                # Save header and file id to a json file if write success
-                info = {"FIGMA-TOKEN": self._api_token}
-                self._token_path.write_text(json.dumps(info))
-                return json.loads(response.text)
-            else:
-                return None
+                return None, code
         except (Exception, requests.HTTPError, requests.exceptions.SSLError) as e:
             print('Error occurred attempting to make an api request. {0}'.format(e))
-            return None
+            sys.exit()
 
-    def get_file(self, file_key, params=None, use_cache=True):
+    def get_file(self, file_key, params=None):
         """
         Get figma file with specified parameters
 
-        :param use_cache: if caching the content
         :param file_key: unique file id
         :param params:
         version [String]: A specific version ID to get. Omitting this will get the current version of the file
@@ -82,34 +67,52 @@ class Figma:
 
         endpoint = 'files/{0}{1}'.format(file_key, optional_param)
         print('-> Connecting to figma api endpoint {}'.format(self._api_uri + endpoint))
-        data = self._api_request(endpoint, method='get')
+        data, code = self._api_request(endpoint, method='get')
 
         if data is None:
-            print('-> Connection failed, abort...')
+            print('-> Server responded with code {}, abort!'.format(code))
             sys.exit()
 
-        if use_cache:
-            self._toCache(data)
+        # Store to cache
+        self._toCache(data)
 
         return data
 
-    def _toCache(self, data, key='document'):
+    def _toCache(self, data: dict, key='document'):
         _d = data[key]
         try:
             print('-> Writing content to cache')
             (HOME / self._cache).write_text(json.dumps(_d))
         except OSError or json.decoder.JSONDecodeError as e:
-            print('Error when writing to file {}, {}'.format(self._cache, e))
+            print('-> Warning! fail writing to cache {}, {}'.format(self._cache, e))
 
-    def _header(self):
-        if not self._token_path.exists():
-            return
+    def _getHeader(self) -> dict[str: str]:
         if self._api_token == '':
             try:
-                data = self._token_path.read_text()
-                info = json.loads(data)
+                info = json.loads(self._token_path.read_text())
                 self._api_token = info['FIGMA-TOKEN']
             except FileNotFoundError:
-                print('local token file not found, please run with argument --token')
+                print('-> Token not found, please run with argument --token')
                 sys.exit()
-        return {'X-Figma-Token': '{0}'.format(self._api_token), 'Content-Type': 'application/json'}
+
+        return {'X-Figma-Token': '{0}'.format(self._api_token),
+                'Content-Type': 'application/json'}
+
+    def _getResponse(self, header, endpoint, method='get', payload=None) -> requests.Response:
+        url = '{0}{1}'.format(self._api_uri, endpoint)
+        if method == 'head':
+            response = requests.head(url, headers=header)
+        elif method == 'delete':
+            response = requests.delete(url, headers=header)
+        elif method == 'get':
+            response = requests.get(url, headers=header, data=payload)
+        elif method == 'options':
+            response = requests.options(url, headers=header)
+        elif method == 'post':
+            response = requests.post(url, headers=header, data=payload)
+        elif method == 'put':
+            response = requests.put(url, headers=header, data=payload)
+        else:
+            print('invalid api method {}'.format(method))
+            sys.exit()
+        return response
