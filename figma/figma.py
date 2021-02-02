@@ -18,28 +18,6 @@ class Figma:
         self._api_token = token
         self._cache = cache
 
-    def _api_request(self, endpoint, method='get', payload=None):
-        method = method.lower()
-
-        if payload is None:
-            payload = ''
-
-        header = self._getHeader()
-
-        try:
-            resp = self._getResponse(header, endpoint, method, payload)
-            # Check response status
-            code = resp.status_code
-            if code == 200:
-                # Save token to a json file if connection is OK
-                self._token_path.write_text(json.dumps({"FIGMA-TOKEN": self._api_token}))
-                return json.loads(resp.text), code
-            else:
-                return None, code
-        except (Exception, requests.HTTPError, requests.exceptions.SSLError) as e:
-            print('Error occurred attempting to make an api request. {0}'.format(e))
-            sys.exit()
-
     def get_file(self, file_key, params=None):
         """
         Get figma file with specified parameters
@@ -67,18 +45,40 @@ class Figma:
 
         endpoint = 'files/{0}{1}'.format(file_key, optional_param)
         print('-> Connecting to figma api endpoint {}'.format(self._api_uri + endpoint))
-        data, code = self._api_request(endpoint, method='get')
+        data, code = self.__request(endpoint, method='get')
 
         if data is None:
             print('-> Server responded with code {}, abort!'.format(code))
             sys.exit()
 
         # Store to cache
-        self._toCache(data)
+        self.__cache(data)
 
         return data
 
-    def _toCache(self, data: dict, key='document'):
+    def __request(self, endpoint, method='get', payload=None):
+        method = method.lower()
+
+        if payload is None:
+            payload = ''
+
+        header = self.__header()
+
+        try:
+            resp = self.__response(header, endpoint, method, payload)
+            # Check response status
+            code = resp.status_code
+            if code == 200:
+                # Save token to a json file if connection is OK
+                self._token_path.write_text(json.dumps({"FIGMA-TOKEN": self._api_token}))
+                return json.loads(resp.text), code
+            else:
+                return None, code
+        except (Exception, requests.HTTPError, requests.exceptions.SSLError) as e:
+            print('Error occurred attempting to make an api request. {0}'.format(e))
+            sys.exit()
+
+    def __cache(self, data: dict, key='document'):
         _d = data[key]
         try:
             print('-> Writing content to cache')
@@ -86,7 +86,7 @@ class Figma:
         except OSError or json.decoder.JSONDecodeError as e:
             print('-> Warning! fail writing to cache {}, {}'.format(self._cache, e))
 
-    def _getHeader(self) -> dict[str: str]:
+    def __header(self) -> dict[str: str]:
         if self._api_token == '':
             try:
                 info = json.loads(self._token_path.read_text())
@@ -98,7 +98,7 @@ class Figma:
         return {'X-Figma-Token': '{0}'.format(self._api_token),
                 'Content-Type': 'application/json'}
 
-    def _getResponse(self, header, endpoint, method='get', payload=None) -> requests.Response:
+    def __response(self, header, endpoint, method='get', payload=None) -> requests.Response:
         url = '{0}{1}'.format(self._api_uri, endpoint)
         if method == 'head':
             response = requests.head(url, headers=header)

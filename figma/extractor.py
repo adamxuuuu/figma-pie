@@ -29,7 +29,15 @@ class Extractor:
             print('-> Local cache not found, please run script with argument --file')
             sys.exit()
 
-    def _extract(self, d):
+    def extract(self):
+        self.__extract(self._data)
+        # show changes
+        self.__diff()
+        self._out_path.write_text(''.join(["{}|{}\n".format(k, v) for k, v in self._res.items()]))
+
+        return self._res
+
+    def __extract(self, d):
         for k, v in d.items():
             try:
                 if k == "name" and re.match('[A-Z]+_[A-Z]+_*', v):
@@ -41,12 +49,12 @@ class Extractor:
                 # Recursion
                 if isinstance(v, list):
                     for item in v:
-                        self._extract(item)
+                        self.__extract(item)
             except AttributeError:
                 # print('{},{}'.format(k, v))
                 pass
 
-    def _load_cache(self):
+    def __load(self):
         d = {}
         try:
             with open(self._out_path, 'r') as cache:
@@ -57,27 +65,10 @@ class Extractor:
             pass
         return d
 
-    def _show_diff(self):
-        removed = set(self._load_cache()) - set(self._res)
-        added = set(self._res) - set(self._load_cache())
+    def __diff(self):
+        removed = set(self.__load()) - set(self._res)
+        added = set(self._res) - set(self.__load())
         for rem in removed:
             prRed('- ' + rem)
         for ad in added:
             prGreen('+ ' + ad)
-
-    def extract(self):
-        self._extract(self._data)
-        # show changes
-        self._show_diff()
-
-        try:
-            with open(self._out_path, 'w') as of:
-                for k, v in self._res.items():
-                    s = "{}|{}\n".format(k, v)
-                    of.write(s)
-        except OSError as e:
-            print(e)
-        finally:
-            of.close()
-
-        return self._res
