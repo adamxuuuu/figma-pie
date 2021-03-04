@@ -37,7 +37,14 @@ class Extractor:
 
         return self._res
 
-    def __extract(self, d):
+    def __extract(self, d: dict):
+        """
+        Recursively extract attributes from a nested <dict> like below:
+
+        {"id": "0:0", "name": "Document", "type": "DOCUMENT", "children":
+        [{"id": "1220:5478", "name": "Design Draft", "type": "CANVAS", "children": [...]}
+        :param d: dict
+        """
         for k, v in d.items():
             try:
                 if k == "name" and re.match('[A-Z]+_[A-Z]+_*', v):
@@ -54,21 +61,19 @@ class Extractor:
                 # print('{},{}'.format(k, v))
                 pass
 
-    def __load(self):
-        d = {}
-        try:
-            with open(self._out_path, 'r') as cache:
-                for line in cache:
-                    (k, v) = line.split('|', 1)
-                    d[k] = v
-        except FileNotFoundError or ValueError:
-            pass
-        return d
-
     def __diff(self):
         removed = set(self.__load()) - set(self._res)
         added = set(self._res) - set(self.__load())
-        for rem in removed:
-            prRed('- ' + rem)
-        for ad in added:
-            prGreen('+ ' + ad)
+        for item in removed:
+            prRed('- ' + item)
+        for item in added:
+            prGreen('+ ' + item)
+
+    def __load(self) -> dict:
+        d = {}
+        self._out_path.read_text()
+        with open(self._out_path, 'r') as cache:
+            for line in cache:
+                (k, v) = line.split('|', 1)
+                d[k] = v
+        return d
