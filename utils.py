@@ -25,10 +25,11 @@ class Utils:
     @staticmethod
     def convert2Dict() -> dict:
         res = {}
+        _dict = {}
 
         tk.Tk().withdraw()
         file2read = Path(filedialog.askopenfilename())
-        _dict = {}
+
         if file2read.name.endswith('.json'):
             _dict = json.loads(file2read.read_text())
         elif file2read.name.endswith('.csv'):

@@ -13,7 +13,7 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 # The ID and range of a sample spreadsheet.
 SPREADSHEET_ID = '1GQc_QEqIe9rW37UL7QB9YBnZ_-2kjhVukxM0JyRSor8'
-RANGE_NAME = 'Attributes!C2:F'
+RANGE_NAME = 'Attributes!D2:G'
 
 
 def __credential():
